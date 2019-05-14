@@ -1,0 +1,14 @@
+{
+	"name": "favtab",
+	"title": "favtab",
+	"description": "Adds a Favourite tab to display a customized list of items, feats and spells. Usable with the default dnd5e Character sheet",
+	"version": "0.1",
+	"author": "Felix",
+	"systems": ["dnd5e"],
+	"scripts": ["./favtab.js"],
+	"styles": [],
+	"packs": [],
+    "url": "https://github.com/syl3r86/favtab",
+    "manifest": "https://github.com/syl3r86/favtab/master/favtab/module.json",
+    "download": "https://github.com/syl3r86/favtab/raw/master/favtab.zip"
+}
