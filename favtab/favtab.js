@@ -85,7 +85,7 @@ Hooks.on(`renderActorSheet5eCharacter`, (app, html, data) => {
             } else {
                 let spellslot = data.actor.data.spells['spell' + spellLvl].value;
                 let spellMax = data.actor.data.spells['spell' + spellLvl].max;
-                let inputStyle = 'style="height:1em; width:2em; margin:0 1px; padding:0;"';
+                let inputStyle = 'style="height:1em; width:2em; margin:0 1px; padding:0; text-align:center;"';
                 itemHeader = `<li class="item inventory-header">`;
                 itemHeader += `<h3>Spell Level ${spellLvl}</h3>`;
                 itemHeader += `<span class="spell-slots" style="display:inline; margin-left:10px;">`;
@@ -138,7 +138,7 @@ function createItemElement(item, app, html, data) {
     itemLi += `</div>`;
     itemLi += `<div class="charges" style="flex:0 0 80px">`;
     if (item.data.charges !== undefined && item.data.charges.max !== 0) {
-        let inputStyle = 'style="height:1em; width:2em; margin:0 1px; padding:0;"';
+        let inputStyle = 'style="height:1em; width:2em; margin:0 1px; padding:0; text-align:center;"';
         itemLi += `<span style="display:inline;">(</span>`;
         itemLi += `<input data-type="value" type="text" ${inputStyle} value="${item.data.charges.value}" ${app.options.editable ? "" : "disabled"}>`;
         itemLi += `<span style="display:inline;">/</span>`;

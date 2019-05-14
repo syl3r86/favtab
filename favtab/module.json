@@ -1,6 +1,6 @@
 {
 	"name": "favtab",
-	"title": "favtab",
+	"title": "Favourite Item Tab",
 	"description": "Adds a Favourite tab to display a customized list of items, feats and spells. Usable with the default dnd5e Character sheet",
 	"version": "0.1",
 	"author": "Felix",
