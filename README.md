@@ -5,7 +5,7 @@ You can add any item from the inventory, spellbook or feature section of the Cha
 
 ## Installation
 1. Download the [favtab.zip](https://github.com/syl3r86/favtab/raw/master/favtab.zip)
-2. Unzip it into FoundryVTT/public/modules
+2. Unzip it into FoundryVTT/resources/app/public/modules
 3. Restart Foundry if it was running.
 4. Activate the module in the settings menu.
 
