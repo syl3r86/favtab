@@ -8,6 +8,7 @@ You can add any item from the inventory, spellbook or feature section of the Cha
 2. Unzip it into FoundryVTT/resources/app/public/modules
 3. Restart Foundry if it was running.
 4. Activate the module in the settings menu.
+4. Enable the module in the Module Configuration
 
 ![example](preview.jpg)
 
