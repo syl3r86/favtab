@@ -21,6 +21,8 @@ Hooks.on(`renderActorSheet5eCharacter`, (app, html, data) => {
 
     let items = data.actor.items;
 
+    let renderFavTab = false;
+
     // processing all items and put them in their respective lists if they're favourited
     for (let item of items) {
         // making sure the flag to set favourites exists
@@ -64,6 +66,7 @@ Hooks.on(`renderActorSheet5eCharacter`, (app, html, data) => {
             let itemLi = createItemElement(item, app, html, data);
             favItemOl.append(itemLi);
         }
+        renderFavTab = true;
     }
 
     // creating the feats list
@@ -74,6 +77,7 @@ Hooks.on(`renderActorSheet5eCharacter`, (app, html, data) => {
             let itemLi = createItemElement(item, app, html, data);
             favFeatOl.append(itemLi);
         }
+        renderFavTab = true;
     }
 
     // creating the spell list
@@ -109,7 +113,7 @@ Hooks.on(`renderActorSheet5eCharacter`, (app, html, data) => {
                 let itemLi = createItemElement(item, app, html, data);
                 favSpellOl.append(itemLi);
             }
-
+            renderFavTab = true;
         }
     }
 
@@ -126,8 +130,10 @@ Hooks.on(`renderActorSheet5eCharacter`, (app, html, data) => {
     favTabDiv.append(favSpellOl);
 
     let tabs = html.find('.sheet-tabs[data-group="primary"]');
-    favTabDiv.insertAfter(tabs);
-    tabs.prepend(favTabBtn);
+    if (renderFavTab) {
+        favTabDiv.insertAfter(tabs);
+        tabs.prepend(favTabBtn);
+    }
 });
 
 function createItemElement(item, app, html, data) {
@@ -136,18 +142,14 @@ function createItemElement(item, app, html, data) {
     itemLi += `<div class="item-image" style="background-image: url(${item.img})"></div>`;
     itemLi += `<h4>${item.name}</h4>`;
     itemLi += `</div>`;
-    itemLi += `<div class="charges" style="flex:0 0 80px">`;
-    if (item.data.charges !== undefined && item.data.charges.max !== 0) {
+    itemLi += `<div class="uses" style="flex:0 0 80px">`;
+    if (item.data.uses.value !== 0 || item.data.uses.max !== 0) {
         let inputStyle = 'style="height:1em; width:2em; margin:0 1px; padding:0; text-align:center;"';
         itemLi += `<span style="display:inline;">(</span>`;
-        itemLi += `<input data-type="value" type="text" ${inputStyle} value="${item.data.charges.value}" ${app.options.editable ? "" : "disabled"}>`;
+        itemLi += `<input data-type="value" type="text" ${inputStyle} value="${item.data.uses.value}" ${app.options.editable ? "" : "disabled"}>`;
         itemLi += `<span style="display:inline;">/</span>`;
-        itemLi += `<input data-type="max" type="text" ${inputStyle} value="${item.data.charges.max}" ${app.options.editable ? "" : "disabled"}>`;
+        itemLi += `<input data-type="max" type="text" ${inputStyle} value="${item.data.uses.max}" ${app.options.editable ? "" : "disabled"}>`;
         itemLi += `<span style="display:inline;">)</span>`;
-    } else {
-        if (app.options.editable) {
-            itemLi += `<a class="addCharges" value="Add Charges">Add Charges</a>`
-        }
     }
     itemLi += `</div>`;
     itemLi += `<div class="item-controlls" style="flex:0 0 22px;">`;
@@ -175,15 +177,15 @@ function createItemElement(item, app, html, data) {
     });
 
     // changing the charges values (removing if both value and max are 0)
-    itemLi.find('.charges input').change(ev => {
-        item.data.charges[ev.target.dataset.type] = Number(ev.target.value);
+    itemLi.find('.uses input').change(ev => {
+        item.data.uses[ev.target.dataset.type] = Number(ev.target.value);
         app.actor.updateOwnedItem(item, true);
         openFavouriteTab(app, html, data);
     })
 
     // creating charges for the item
     itemLi.find('.addCharges').click(ev => {
-        item.data.charges = { value: 1, max: 1 };
+        item.data.uses = { value: 1, max: 1 };
         app.actor.updateOwnedItem(item, true);
         openFavouriteTab(app, html, data);
     });
