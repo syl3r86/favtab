@@ -143,7 +143,7 @@ function createItemElement(item, app, html, data) {
     itemLi += `<h4>${item.name}</h4>`;
     itemLi += `</div>`;
     itemLi += `<div class="uses" style="flex:0 0 80px">`;
-    if (item.data.uses.value !== 0 || item.data.uses.max !== 0) {
+    if (item.data.uses !== undefined && (item.data.uses.value !== 0 || item.data.uses.max !== 0)) {
         let inputStyle = 'style="height:1em; width:2em; margin:0 1px; padding:0; text-align:center;"';
         itemLi += `<span style="display:inline;">(</span>`;
         itemLi += `<input data-type="value" type="text" ${inputStyle} value="${item.data.uses.value}" ${app.options.editable ? "" : "disabled"}>`;
