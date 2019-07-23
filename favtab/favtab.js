@@ -130,9 +130,14 @@ Hooks.on(`renderActorSheet5eCharacter`, (app, html, data) => {
     favTabDiv.append(favSpellOl);
 
     let tabs = html.find('.sheet-tabs[data-group="primary"]');
+    let tabContainer = html.find('.sheet-content');
     if (renderFavTab) {
-        favTabDiv.insertAfter(tabs);
+        tabContainer.append(favTabDiv);
         tabs.prepend(favTabBtn);
+    }
+    if (app.activateFavTab) {
+        $(`.app[data-appid="${app.appId}"] .tabs .item[data-tab="favourite"]`).trigger('click');
+        app.activateFavTab = false;
     }
 });
 
@@ -143,13 +148,17 @@ function createItemElement(item, app, html, data) {
     itemLi += `<h4>${item.name}</h4>`;
     itemLi += `</div>`;
     itemLi += `<div class="uses" style="flex:0 0 80px">`;
-    if (item.data.uses !== undefined && (item.data.uses.value !== 0 || item.data.uses.max !== 0)) {
+    if (item.data.uses !== undefined && ((item.data.uses.value !== undefined && item.data.uses.value !== 0) || (item.data.uses.max !== undefined && item.data.uses.max !== 0))) {
         let inputStyle = 'style="height:1em; width:2em; margin:0 1px; padding:0; text-align:center;"';
         itemLi += `<span style="display:inline;">(</span>`;
         itemLi += `<input data-type="value" type="text" ${inputStyle} value="${item.data.uses.value}" ${app.options.editable ? "" : "disabled"}>`;
         itemLi += `<span style="display:inline;">/</span>`;
         itemLi += `<input data-type="max" type="text" ${inputStyle} value="${item.data.uses.max}" ${app.options.editable ? "" : "disabled"}>`;
         itemLi += `<span style="display:inline;">)</span>`;
+    } else {
+        if (app.options.editable) {
+            itemLi += `<a class="addCharges" value="Add Charges">Add Charges</a>`
+        }
     }
     itemLi += `</div>`;
     itemLi += `<div class="item-controlls" style="flex:0 0 22px;">`;
@@ -173,21 +182,21 @@ function createItemElement(item, app, html, data) {
     itemLi.find('.item-fav').click(ev => {
         item.flags.favtab.isFavourite = !item.flags.favtab.isFavourite;
         app.actor.updateOwnedItem(item, true);
-        openFavouriteTab(app, html, data);
+        app.activateFavTab = true;
     });
 
     // changing the charges values (removing if both value and max are 0)
     itemLi.find('.uses input').change(ev => {
         item.data.uses[ev.target.dataset.type] = Number(ev.target.value);
         app.actor.updateOwnedItem(item, true);
-        openFavouriteTab(app, html, data);
+        app.activateFavTab = true;
     })
 
     // creating charges for the item
     itemLi.find('.addCharges').click(ev => {
         item.data.uses = { value: 1, max: 1 };
         app.actor.updateOwnedItem(item, true);
-        openFavouriteTab(app, html, data);
+        app.activateFavTab = true;
     });
 
     // hiding the "add charges" button and only showing it when in the apropiate item
@@ -204,8 +213,10 @@ function createItemElement(item, app, html, data) {
 // function to return to the favourite tab after rerendering of the sheet
 // this is required since the sheet cant reopen an injected tab after rerendering
 function openFavouriteTab(app, html, data) {
+    app.activateFavTab = true;/*
     setTimeout(() => {
         console.log(app);
+        console.log($(`.app[data-appid="${app.appId}"] .tabs .item[data-tab="favourite"]`));
         $(`.app[data-appid="${app.appId}"] .tabs .item[data-tab="favourite"]`).trigger('click');
-    }, 50);
+    }, 150);*/
 }
