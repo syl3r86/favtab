@@ -12,6 +12,7 @@ You can add any item from the inventory, spellbook or feature section of the Cha
 
 ![example](preview.jpg)
 
+Once you marked at least one item as favourite, the tab will show up and offer the new possibilitys.
 If you have any suggestions or problems concerning this module, feel free to contact me in discord (Felix#6196) or per email (syl3r31@gmail.com).
 
 
