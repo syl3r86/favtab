@@ -142,8 +142,8 @@ Hooks.on(`renderActorSheet5eCharacter`, (app, html, data) => {
 });
 
 function createItemElement(item, app, html, data) {
-    let itemLi = `<li class="item fav-item" data-item-id="${item.id}">`
-    itemLi += `<div class="item-name rollable">`;
+    let itemLi = `<li class="item flexrow fav-item" data-item-id="${item.id}">`
+    itemLi += `<div class="item-name flexrow rollable">`;
     itemLi += `<div class="item-image" style="background-image: url(${item.img})"></div>`;
     itemLi += `<h4>${item.name}</h4>`;
     itemLi += `</div>`;
