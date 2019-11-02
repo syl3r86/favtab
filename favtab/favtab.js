@@ -3,14 +3,12 @@
  * @version 0.4.1
  */
 
-
-Hooks.on(`renderActorSheet5eCharacter`, (app, html, data) => {
-
+function addFavTab(app, html, data) {
     // creating the favourite tab and loading favourited items
     let favTabBtn = $('<a class="item" data-tab="favourite"><i class="fas fa-star"></i></a>');
     let favTabDiv = $('<div class="tab inventory-list favourite" data-group="primary" data-tab="favourite"></div>');
 
-    let olStyle = `style="padding-left:5px;"`;
+    let olStyle = `style="padding-left:5px; list-style-type:none;"`;
     let favItemOl = $(`<ol class="fav-item" ${olStyle}></ol>`);
     let favFeatOl = $(`<ol class="fav-feat" ${olStyle}></ol>`);
     let favSpellOl = $(`<ol class="fav-spell" ${olStyle}></ol>`);
@@ -25,6 +23,9 @@ Hooks.on(`renderActorSheet5eCharacter`, (app, html, data) => {
 
     // processing all items and put them in their respective lists if they're favourited
     for (let item of items) {
+        // do not add the fav button for class items
+        if (item.type == "class") continue;
+
         // making sure the flag to set favourites exists
         if (item.flags.favtab === undefined || item.flags.favtab.isFavourite === undefined) {
             item.flags.favtab = { isFavourite: false };
@@ -42,7 +43,7 @@ Hooks.on(`renderActorSheet5eCharacter`, (app, html, data) => {
             });
             html.find(`.item[data-item-id="${item.id}"]`).find('.item-controls').prepend(favBtn);
         }
-        
+
         if (isFav) {
             switch (item.type) {
                 case 'feat':
@@ -139,7 +140,15 @@ Hooks.on(`renderActorSheet5eCharacter`, (app, html, data) => {
         $(`.app[data-appid="${app.appId}"] .tabs .item[data-tab="favourite"]`).trigger('click');
         app.activateFavTab = false;
     }
+}
+
+Hooks.on(`renderActorSheet5eCharacter`, (app, html, data) => {
+    addFavTab(app, html, data);
 });
+Hooks.on(`renderSky5eSheet`, (app, html, data) => {
+    addFavTab(app, html, data);
+});
+
 
 function createItemElement(item, app, html, data) {
     let itemLi = `<li class="item flexrow fav-item" data-item-id="${item.id}">`
