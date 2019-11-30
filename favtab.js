@@ -1,6 +1,6 @@
 /**
  * @author Felix Müller aka syl3r86
- * @version 0.4.1
+ * @version 0.5.0
  */
 
 function addFavTab(app, html, data) {
@@ -50,7 +50,11 @@ function addFavTab(app, html, data) {
                     favFeats.push(item);
                     break;
                 case 'spell':
-                    favSpells[item.data.level.value].push(item);
+                    if (item.data.level) {
+                        favSpells[item.data.level].push(item);
+                    } else {
+                        favSpells[0].push(item);
+                    }
                     break;
                 default:
                     favItems.push(item);
@@ -91,7 +95,7 @@ function addFavTab(app, html, data) {
                 let spellslot = data.actor.data.spells['spell' + spellLvl].value;
                 let spellMax = data.actor.data.spells['spell' + spellLvl].max;
                 let inputStyle = 'style="height:1em; width:2em; margin:0 1px; padding:0; text-align:center;"';
-                itemHeader = `<li class="item inventory-header">`;
+                itemHeader = `<li class="item inventory-header flexrow">`;
                 itemHeader += `<h3>Spell Level ${spellLvl}</h3>`;
                 itemHeader += `<span class="spell-slots" style="display:inline; margin-left:10px;">`;
                 itemHeader += `<input type="text" ${inputStyle} data-target="data.spells.spell${spellLvl}.value" value="${spellslot}" placeholder="0"/>`;
@@ -121,7 +125,7 @@ function addFavTab(app, html, data) {
     // changing some css in the sheet to acomodate the new favourite button
     if (app.options.editable) {
         html.find('.spellbook .item-controls').css('flex', '0 0 88px');
-        html.find('.inventory .item-controls, .feats .item-controls').css('flex', '0 0 66px');
+        html.find('.inventory .item-controls, .features .item-controls').css('flex', '0 0 66px');
         html.find('.favourite .item-controls').css('flex', '0 0 22px');
     }
 
@@ -130,8 +134,8 @@ function addFavTab(app, html, data) {
     favTabDiv.append(favFeatOl);
     favTabDiv.append(favSpellOl);
 
-    let tabs = html.find('.sheet-tabs[data-group="primary"]');
-    let tabContainer = html.find('.sheet-content');
+    let tabs = html.find('.tabs[data-group="primary"]');
+    let tabContainer = html.find('.sheet-body');
     if (renderFavTab) {
         tabContainer.append(favTabDiv);
         tabs.prepend(favTabBtn);
@@ -151,11 +155,21 @@ Hooks.on(`renderSky5eSheet`, (app, html, data) => {
 
 
 function createItemElement(item, app, html, data) {
+    let spellPrepMode = '';
+    if (item.type === 'spell' && item.data.preparation.mode) {
+        spellPrepMode = ` (${CONFIG.DND5E.spellPreparationModes[item.data.preparation.mode]})`
+    }
     let itemLi = `<li class="item flexrow fav-item" data-item-id="${item.id}">`
     itemLi += `<div class="item-name flexrow rollable">`;
     itemLi += `<div class="item-image" style="background-image: url(${item.img})"></div>`;
-    itemLi += `<h4>${item.name}</h4>`;
+    itemLi += `<h4>${item.name}${spellPrepMode}</h4 >`;
     itemLi += `</div>`;
+
+    // action labels 
+    /*if (item.labels && item.labels.activation) {
+        itemLi += `<div class="item-action" style="flex 0 0 0;">${item.labels.activation}</div>`;
+    }*/
+    // uses
     itemLi += `<div class="uses" style="flex:0 0 80px">`;
     if (item.data.uses !== undefined && ((item.data.uses.value !== undefined && item.data.uses.value !== 0) || (item.data.uses.max !== undefined && item.data.uses.max !== 0))) {
         let inputStyle = 'style="height:1em; width:2em; margin:0 1px; padding:0; text-align:center;"';
@@ -170,7 +184,8 @@ function createItemElement(item, app, html, data) {
         }
     }
     itemLi += `</div>`;
-    itemLi += `<div class="item-controlls" style="flex:0 0 22px;">`;
+    itemLi += `<div class="item-controlls" style="flex:0 0 44px;">`;
+    itemLi += `<a class="item-control item-edit" title="Edit Item" > <i class="fas fa-edit" ></i ></a >`;
     itemLi += `<a class="item-control item-fav" title="remove from favourites" > <i class="fas fa-sign-out-alt" ></i ></a >`;
     itemLi += `</div>`;
     itemLi += `</li>`;
@@ -186,6 +201,12 @@ function createItemElement(item, app, html, data) {
 
     // rolling the item
     itemLi.find('.item-image').click(event => app._onItemRoll(event));
+
+    // editing the item
+    itemLi.find('.item-edit').click(event => {
+        app.actor.getOwnedItem(item.id).sheet.render(true);
+        //item.sheet.render(true);
+    });
 
     // removing item from favourite list
     itemLi.find('.item-fav').click(ev => {
