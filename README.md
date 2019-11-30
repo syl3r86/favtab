@@ -3,12 +3,13 @@
 Adds a Favourite tab to display a customized list of items, feats and spells. Usable with the default dnd5e Character sheet.
 You can add any item from the inventory, spellbook or feature section of the Charactersheet. This module also gives access to item charges. You can add these to any item on the favourite list or remove them by changing the maximum to 0. This uses the same data that is used by Moerill#7205's adnd5e module, since this data is not supported by default.
 
+
 ## Installation
-1. Download the [favtab.zip](https://github.com/syl3r86/favtab/raw/master/favtab.zip)
-2. Unzip it into FoundryVTT/resources/app/public/modules
-3. Restart Foundry if it was running.
-4. Activate the module in the settings menu.
-4. Enable the module in the Module Configuration
+1. Copy this link and use it in Foundrys Module Manager to install the Module
+
+    > https://raw.githubusercontent.com/syl3r86/favtab/pre-0.4.0/module.json
+    
+2. Enable the Module in your Worlds Module Settings
 
 ![example](preview.jpg)
 
