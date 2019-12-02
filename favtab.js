@@ -1,6 +1,6 @@
 /**
  * @author Felix Müller aka syl3r86
- * @version 0.5.0
+ * @version 0.5.2
  */
 
 function addFavTab(app, html, data) {
@@ -142,8 +142,12 @@ function addFavTab(app, html, data) {
     }
     if (app.activateFavTab) {
         $(`.app[data-appid="${app.appId}"] .tabs .item[data-tab="favourite"]`).trigger('click');
-        app.activateFavTab = false;
+        //app.activateFavTab = false;
     }
+
+    html.find('.tabs .item:not(.tabs .item[data-tab="favourite"])').click(ev => {
+        app.activateFavTab = false;
+    });
 }
 
 Hooks.on(`renderActorSheet5eCharacter`, (app, html, data) => {
@@ -239,6 +243,8 @@ function createItemElement(item, app, html, data) {
     
     return itemLi;
 }
+
+
 
 // function to return to the favourite tab after rerendering of the sheet
 // this is required since the sheet cant reopen an injected tab after rerendering
