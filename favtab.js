@@ -205,7 +205,7 @@ function createItemElement(item, app, html, data) {
     // editing the item
     itemLi.find('.item-edit').click(event => {
         app.actor.getOwnedItem(item.id).sheet.render(true);
-        //item.sheet.render(true);
+        app.activateFavTab = true;
     });
 
     // removing item from favourite list
