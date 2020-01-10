@@ -3,7 +3,7 @@
 Adds a Favourite tab to display a customized list of items, feats and spells. Usable with the default dnd5e Character sheet.
 You can add any item from the inventory, spellbook or feature section of the Charactersheet.
 
-> This version only works for Foundry v0.4.0 and up. To use the previous version please visit https://github.com/syl3r86/favtab/tree/pre-0.4.0
+> This version only works for Foundry v0.4.4 and up. To use the previous version please visit https://github.com/syl3r86/favtab/tree/pre-0.4.4
 
 ## Installation
 1. Copy this link and use it in Foundrys Module Manager to install the Module
