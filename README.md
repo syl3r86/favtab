@@ -8,7 +8,7 @@ You can add any item from the inventory, spellbook or feature section of the Cha
 ## Installation
 1. Copy this link and use it in Foundrys Module Manager to install the Module
 
-    > https://raw.githubusercontent.com/syl3r86/favtab/master/module.json
+    > https://raw.githubusercontent.com/syl3r86/favtab/master/pre-0.4.4.json
     
 2. Enable the Module in your Worlds Module Settings
 
