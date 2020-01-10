@@ -1,6 +1,6 @@
 /**
  * @author Felix Müller aka syl3r86
- * @version 0.5.2
+ * @version 0.5.4
  */
 
 function addFavTab(app, html, data) {
@@ -38,10 +38,9 @@ function addFavTab(app, html, data) {
         if (app.options.editable) {
             let favBtn = $(`<a class="item-control item-fav" data-fav="${isFav}" title="${isFav ? "remove from favourites" : "add to favourites"}"><i class="fas ${isFav ? "fa-star" : "fa-sign-in-alt"}"></i></a>`);
             favBtn.click(ev => {
-                item.flags.favtab.isFavourite = !item.flags.favtab.isFavourite;
-                app.actor.updateOwnedItem(item, true);
+                app.actor.getOwnedItem(item._id).update({ "flags.favtab.isFavourite": !item.flags.favtab.isFavourite });
             });
-            html.find(`.item[data-item-id="${item.id}"]`).find('.item-controls').prepend(favBtn);
+            html.find(`.item[data-item-id="${item._id}"]`).find('.item-controls').prepend(favBtn);
         }
 
         if (isFav) {
@@ -144,7 +143,6 @@ function addFavTab(app, html, data) {
         $(`.app[data-appid="${app.appId}"] .tabs .item[data-tab="favourite"]`).trigger('click');
         //app.activateFavTab = false;
     }
-
     html.find('.tabs .item:not(.tabs .item[data-tab="favourite"])').click(ev => {
         app.activateFavTab = false;
     });
@@ -163,7 +161,7 @@ function createItemElement(item, app, html, data) {
     if (item.type === 'spell' && item.data.preparation.mode) {
         spellPrepMode = ` (${CONFIG.DND5E.spellPreparationModes[item.data.preparation.mode]})`
     }
-    let itemLi = `<li class="item flexrow fav-item" data-item-id="${item.id}">`
+    let itemLi = `<li class="item flexrow fav-item" data-item-id="${item._id}">`
     itemLi += `<div class="item-name flexrow rollable">`;
     itemLi += `<div class="item-image" style="background-image: url(${item.img})"></div>`;
     itemLi += `<h4>${item.name}${spellPrepMode}</h4 >`;
@@ -208,21 +206,25 @@ function createItemElement(item, app, html, data) {
 
     // editing the item
     itemLi.find('.item-edit').click(event => {
-        app.actor.getOwnedItem(item.id).sheet.render(true);
+        //app.actor.getOwnedItem(item.id).sheet.render(true);
+        app.actor.getOwnedItem(item._id).sheet.render(true);
         app.activateFavTab = true;
     });
 
     // removing item from favourite list
     itemLi.find('.item-fav').click(ev => {
-        item.flags.favtab.isFavourite = !item.flags.favtab.isFavourite;
+        /*item.flags.favtab.isFavourite = !item.flags.favtab.isFavourite;
         app.actor.updateOwnedItem(item, true);
-        app.activateFavTab = true;
+        app.activateFavTab = true;*/
+        app.actor.getOwnedItem(item._id).update({ "flags.favtab.isFavourite": !item.flags.favtab.isFavourite });
     });
 
     // changing the charges values (removing if both value and max are 0)
     itemLi.find('.uses input').change(ev => {
-        item.data.uses[ev.target.dataset.type] = Number(ev.target.value);
-        app.actor.updateOwnedItem(item, true);
+        let path = `data.uses.`+ev.target.dataset.type;
+        let obj = {};
+        obj[path] = Number(ev.target.value);
+        app.actor.getOwnedItem(item._id).update(obj);
         app.activateFavTab = true;
     })
 
