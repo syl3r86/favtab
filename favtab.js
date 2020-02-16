@@ -151,6 +151,9 @@ function addFavTab(app, html, data) {
 Hooks.on(`renderActorSheet5eCharacter`, (app, html, data) => {
     addFavTab(app, html, data);
 });
+Hooks.on(`renderActorSheet5eCharacterDark`, (app, html, data) => {
+    addFavTab(app, html, data);
+});
 Hooks.on(`renderSky5eSheet`, (app, html, data) => {
     addFavTab(app, html, data);
 });
