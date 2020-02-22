@@ -17,7 +17,10 @@ You can add any item from the inventory, spellbook or feature section of the Cha
 Once you marked at least one item as favourite, the tab will show up and offer the new possibilitys.
 If you have any suggestions or problems concerning this module, feel free to contact me in discord (Felix#6196) or per email (syl3r31@gmail.com).
 
+## Notice for Sheet Developers
+If you are developing a sheet and want to strictly disable favtab for your sheet, you can do that by including `blockFavTab=true` in your sheet classes options (in the `static get defaultOptions` function for example). You can see this implementation in my Better NPC Sheet (https://github.com/syl3r86/BetterNPCSheet5e/blob/master/betternpcsheet.js line 34).
 
+Favtab will also check if the nessessary html elements are present to ensure compability.
 
 ## Contribution
 If you feel like supporting my work, feel free to leave a tip at my paypal felix.mueller.86@web.de
