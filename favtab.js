@@ -23,6 +23,7 @@ async function addFavTab(app, html, data) {
     let favFeats = [];
     let favSpells = {
         0: {
+            isCantrip: true,
             spells: []
         }, 1: {
             spells: [],

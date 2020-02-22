@@ -25,8 +25,8 @@
         {{#each favSpells as |section lvl|}}
             {{#if section.spells}}
                 {{#if lvl}}
-                    <li class="item inventory-header flexrow">
-                        <h3>Spell Level {{lvl}}</h3>
+                    <li class="item inventory-header flexrow">                        
+                        <h3>{{#if section.isCantrip}}Cantrip{{else}}Spell Level {{lvl}}{{/if}}</h3>
                         <span class="spell-slots">
                             <input type="text" ${inputStyle} data-target="data.spells.spell{{lvl}}.value" value="{{section.value}}" placeholder="0"/>
                             /
