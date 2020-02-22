@@ -3,20 +3,67 @@
  * @version 0.5.4
  */
 
-function addFavTab(app, html, data) {
+async function addFavTab(app, html, data) {
+
+    // checking compatibility
+    if (app.options.blockFavTab) {
+        console.log(`Favtab | Favourite Item Tab has been blocked by the author of the sheet used for ${data.actor.name}`);
+        return;
+    }
+    if (html.find('.tabs[data-group="primary"]').length === 0 || html.find('.sheet-body').length === 0) {
+        console.log(`FavTab | Can't access required sheet components for acotr ${data.actor.name}. Not enabling FavTab`);
+        return;
+    }
+
+
     // creating the favourite tab and loading favourited items
     let favTabBtn = $('<a class="item" data-tab="favourite"><i class="fas fa-star"></i></a>');
-    let favTabDiv = $('<div class="tab inventory-list favourite" data-group="primary" data-tab="favourite"></div>');
-
-    let olStyle = `style="padding-left:5px; list-style-type:none;"`;
-    let favItemOl = $(`<ol class="fav-item" ${olStyle}></ol>`);
-    let favFeatOl = $(`<ol class="fav-feat" ${olStyle}></ol>`);
-    let favSpellOl = $(`<ol class="fav-spell" ${olStyle}></ol>`);
 
     let favItems = [];
     let favFeats = [];
-    let favSpells = { 0: [], 1: [], 2: [], 3: [], 4: [], 5: [], 6: [], 7: [], 8: [], 9: [] }
-
+    let favSpells = {
+        0: {
+            spells: []
+        }, 1: {
+            spells: [],
+            value: data.actor.data.spells.spell1.value,
+            max: data.actor.data.spells.spell1.max
+        }, 2: {
+            spells: [],
+            value: data.actor.data.spells.spell2.value,
+            max: data.actor.data.spells.spell2.max
+        }, 3: {
+            spells: [],
+            value: data.actor.data.spells.spell3.value,
+            max: data.actor.data.spells.spell3.max
+        }, 4: {
+            spells: [],
+            value: data.actor.data.spells.spell4.value,
+            max: data.actor.data.spells.spell4.max
+        }, 5: {
+            spells: [],
+            value: data.actor.data.spells.spell5.value,
+            max: data.actor.data.spells.spell5.max
+        }, 6: {
+            spells: [],
+            value: data.actor.data.spells.spell6.value,
+            max: data.actor.data.spells.spell6.max
+        }, 7: {
+            spells: [],
+            value: data.actor.data.spells.spell7.value,
+            max: data.actor.data.spells.spell7.max
+        }, 8: {
+            spells: [],
+            value: data.actor.data.spells.spell8.value,
+            max: data.actor.data.spells.spell8.max
+        }, 9: {
+            spells: [],
+            value: data.actor.data.spells.spell9.value,
+            max: data.actor.data.spells.spell9.max
+        }
+    }
+    
+    let spellCount = 0
     let items = data.actor.items;
 
     let renderFavTab = false;
@@ -44,80 +91,44 @@ function addFavTab(app, html, data) {
         }
 
         if (isFav) {
+            renderFavTab = true;
+
+            // creating specific labels to be displayed
+            let labels = {};
+            if (item.data.components && item.data.components.concentration) {
+                labels.concentration = 'Concentration';
+            }
+            if (item.data.activation.type) {
+                labels.activation = `${item.data.activation.cost ? item.data.activation.cost+' ':''}${item.data.activation.type.capitalize()}`;
+            }
+            item.favLabels = labels;
+            
+            item.editable = app.options.editable;
             switch (item.type) {
                 case 'feat':
+                    if (item.flags.favtab.sort === undefined) {
+                        item.flags.favtab.sort = (favFeats.count + 1) * 100000; // initial sort key if not present
+                    }
                     favFeats.push(item);
                     break;
                 case 'spell':
-                    if (item.data.level) {
-                        favSpells[item.data.level].push(item);
-                    } else {
-                        favSpells[0].push(item);
+                    if (item.data.preparation.mode) {
+                        item.spellPrepMode = ` (${CONFIG.DND5E.spellPreparationModes[item.data.preparation.mode]})`
                     }
+                    if (item.data.level) {
+                        favSpells[item.data.level].spells.push(item);
+                    } else {
+                        favSpells[0].spells.push(item);
+                    }
+                    spellCount++;
                     break;
                 default:
+                    if (item.flags.favtab.sort === undefined) {
+                        item.flags.favtab.sort = (favItems.count + 1) * 100000; // initial sort key if not present
+                    }
                     favItems.push(item);
                     break;
             }
-        }
-    }
-
-    // creating the item list
-    if (favItems.length >= 1) {
-        let itemHeader = $(`<li class="item inventory-header"><h3>Items</h3></li>`);
-        favItemOl.append(itemHeader);
-        for (let item of favItems) {
-            let itemLi = createItemElement(item, app, html, data);
-            favItemOl.append(itemLi);
-        }
-        renderFavTab = true;
-    }
-
-    // creating the feats list
-    if (favFeats.length >= 1) {
-        let itemHeader = $(`<li class="item inventory-header"><h3>Feats</h3></li>`);
-        favFeatOl.append(itemHeader);
-        for (let item of favFeats) {
-            let itemLi = createItemElement(item, app, html, data);
-            favFeatOl.append(itemLi);
-        }
-        renderFavTab = true;
-    }
-
-    // creating the spell list
-    for (let spellLvl in favSpells) {
-        if (favSpells[spellLvl].length >= 1) {
-            let itemHeader = '';
-            if (spellLvl === '0') {
-                itemHeader = $(`<li class="item inventory-header"><h3>Cantrips</h3></li>`);
-            } else {
-                let spellslot = data.actor.data.spells['spell' + spellLvl].value;
-                let spellMax = data.actor.data.spells['spell' + spellLvl].max;
-                let inputStyle = 'style="height:1em; width:2em; margin:0 1px; padding:0; text-align:center;"';
-                itemHeader = `<li class="item inventory-header flexrow">`;
-                itemHeader += `<h3>Spell Level ${spellLvl}</h3>`;
-                itemHeader += `<span class="spell-slots" style="display:inline; margin-left:10px;">`;
-                itemHeader += `<input type="text" ${inputStyle} data-target="data.spells.spell${spellLvl}.value" value="${spellslot}" placeholder="0"/>`;
-                itemHeader += `/`;
-                itemHeader += `<input type="text" ${inputStyle} data-target="data.spells.spell${spellLvl}.max" value="${spellMax}" placeholder="0"/>`;
-                itemHeader += `</span>`;
-                itemHeader += `</li>`;
-                itemHeader = $(itemHeader);
-
-                // creating event for changing spell slot amount
-                itemHeader.find('input').change(ev => {
-                    let target = ev.target.dataset.target;
-                    $(html.find(`input[name="${target}"]`)).val(ev.target.value).trigger('submit', ev);
-                    openFavouriteTab(app, html, data);
-                });
-            }
-
-            favSpellOl.append(itemHeader);
-            for (let item of favSpells[spellLvl]) {
-                let itemLi = createItemElement(item, app, html, data);
-                favSpellOl.append(itemLi);
-            }
-            renderFavTab = true;
         }
     }
 
@@ -128,136 +139,144 @@ function addFavTab(app, html, data) {
         html.find('.favourite .item-controls').css('flex', '0 0 22px');
     }
 
-    // finish up building the favourite div and add it and the coresponding tab-button
-    favTabDiv.append(favItemOl);
-    favTabDiv.append(favFeatOl);
-    favTabDiv.append(favSpellOl);
-
     let tabs = html.find('.tabs[data-group="primary"]');
     let tabContainer = html.find('.sheet-body');
     if (renderFavTab) {
-        tabContainer.append(favTabDiv);
+
+        // rendering of the favtab
+        let data = {};
+        data.favItems = favItems.length > 0 ? favItems.sort((a, b) => (a.flags.favtab.sort) - (b.flags.favtab.sort)) : false;
+        data.favFeats = favFeats.length > 0 ? favFeats.sort((a, b) => (a.flags.favtab.sort) - (b.flags.favtab.sort)) : false;
+        data.favSpells = spellCount > 0 ? favSpells : false;
+        data.editable = app.options.editable;
+
+        await loadTemplates(['modules/favtab/templates/item.hbs']);
+        let favtabHtml = $(await renderTemplate('modules/favtab/templates/template.hbs', data));
+
+        // Activating favourite-list events
+
+        // showing item summary
+        favtabHtml.find('.item-name h4').click(event => app._onItemSummary(event));
+
+        // the rest is only needed if the sheet is editable
+        if (app.options.editable) {
+            // rolling the item
+            favtabHtml.find('.item-image').click(ev => app._onItemRoll(ev));
+
+            // Item Dragging
+            let handler = ev => app._onDragItemStart(ev);
+            favtabHtml.find('.item').each((i, li) => {
+                if (li.classList.contains("inventory-header")) return;
+                li.setAttribute("draggable", true);
+                li.addEventListener("dragstart", handler, false);
+            });
+
+            // editing the item
+            favtabHtml.find('.item-edit').click(ev => {
+                let itemId = $(ev.target).parents('.item')[0].dataset.itemId;
+                app.actor.getOwnedItem(itemId).sheet.render(true);
+            });
+
+            // removing item from favourite list
+            favtabHtml.find('.item-fav').click(ev => {
+                let itemId = $(ev.target).parents('.item')[0].dataset.itemId;
+                let val = !app.actor.getOwnedItem(itemId).data.flags.favtab.isFavourite
+                app.actor.getOwnedItem(itemId).update({ "flags.favtab.isFavourite": val });
+            });
+
+            // changing the charges values (removing if both value and max are 0)
+            favtabHtml.find('.item input').change(ev => {
+                let itemId = $(ev.target).parents('.item')[0].dataset.itemId;
+                let path = ev.target.dataset.path;
+                let data = {};
+                data[path] = Number(ev.target.value);
+                app.actor.getOwnedItem(itemId).update(data);
+                app.activateFavTab = true;
+            })
+
+            // creating charges for the item
+            favtabHtml.find('.addCharges').click(ev => {
+                let itemId = $(ev.target).parents('.item')[0].dataset.itemId;
+                let item = app.actor.getOwnedItem(itemId);
+                
+                item.data.uses = { value: 1, max: 1 };
+                let data = {};
+                data['data.uses.value'] = 1;
+                data['data.uses.max'] = 1;
+
+                app.actor.getOwnedItem(itemId).update(data);
+            });
+
+            // hiding the "add charges" button and only showing it when in the apropiate item
+            favtabHtml.find('.addCharges').hide();
+            favtabHtml.find('.item').hover(evIn => {
+                $(evIn.target).parents('.item').find('.addCharges').show();
+            }, evOut => {
+                $(evOut.target).parents('.item').find('.addCharges').hide();
+            });
+
+            // custom sorting
+            favtabHtml.find('.item').on('drop', ev => {
+                ev.preventDefault();
+                ev.stopPropagation();
+
+                let dropData = JSON.parse(ev.originalEvent.dataTransfer.getData('text/plain'));
+
+                if (dropData.actorId !== app.actor.id || dropData.data.type === 'spell') {
+                    // only do sorting if the item is from the same actor (not droped from outside) and is not a spell
+                    return;
+                }
+
+                let list = null;
+                if (dropData.data.type === 'feat') {
+                    list = favFeats;
+                } else {
+                    list = favItems;
+                }
+
+                let dragSource = list.find(i => i._id === dropData.data._id);
+                let siblings = list.filter(i=> i._id !== dropData.data._id);
+                let targetId = ev.target.closest('.item').dataset.itemId;
+                let dragTarget = siblings.find(s => s._id === targetId);
+
+                if (dragTarget === undefined) {
+                    // catch trying to drag from one list to the other, which is not supported
+                    return;
+                }
+
+                // Perform the sort
+                const sortUpdates = SortingHelpers.performIntegerSort(dragSource, { target: dragTarget, siblings: siblings, sortKey:'flags.favtab.sort'});
+                const updateData = sortUpdates.map(u => {
+                    const update = u.update;
+                    update._id = u.target._id;
+                    return update;
+                });
+
+                app.actor.updateManyEmbeddedEntities("OwnedItem", updateData);
+            });
+        }
+
+        // adding the html to the apropiate containers
+        tabContainer.append(favtabHtml);
         tabs.prepend(favTabBtn);
     }
+
+    // open the favtab if its registered as the active tab
     if (app.activateFavTab) {
         $(`.app[data-appid="${app.appId}"] .tabs .item[data-tab="favourite"]`).trigger('click');
-        //app.activateFavTab = false;
     }
+
+    // register the favtab as teh active tab
+    html.find('.tabs .item[data-tab="favourite"]').click(ev => {
+        app.activateFavTab = true;
+    });
+    // unregister the favtab as the active tab
     html.find('.tabs .item:not(.tabs .item[data-tab="favourite"])').click(ev => {
         app.activateFavTab = false;
     });
 }
 
-Hooks.on(`renderActorSheet5eCharacter`, (app, html, data) => {
+
+Hooks.on(`renderActorSheet`, (app, html, data) => {
     addFavTab(app, html, data);
 });
-Hooks.on(`renderActorSheet5eCharacterDark`, (app, html, data) => {
-    addFavTab(app, html, data);
-});
-Hooks.on(`renderSky5eSheet`, (app, html, data) => {
-    addFavTab(app, html, data);
-});
-
-
-function createItemElement(item, app, html, data) {
-    let spellPrepMode = '';
-    if (item.type === 'spell' && item.data.preparation.mode) {
-        spellPrepMode = ` (${CONFIG.DND5E.spellPreparationModes[item.data.preparation.mode]})`
-    }
-    let itemLi = `<li class="item flexrow fav-item" data-item-id="${item._id}">`
-    itemLi += `<div class="item-name flexrow rollable">`;
-    itemLi += `<div class="item-image" style="background-image: url(${item.img})"></div>`;
-    itemLi += `<h4>${item.name}${spellPrepMode}</h4 >`;
-    itemLi += `</div>`;
-
-    // action labels 
-    /*if (item.labels && item.labels.activation) {
-        itemLi += `<div class="item-action" style="flex 0 0 0;">${item.labels.activation}</div>`;
-    }*/
-    // uses
-    itemLi += `<div class="uses" style="flex:0 0 80px">`;
-    if (item.data.uses !== undefined && ((item.data.uses.value !== undefined && item.data.uses.value !== 0) || (item.data.uses.max !== undefined && item.data.uses.max !== 0))) {
-        let inputStyle = 'style="height:1em; width:2em; margin:0 1px; padding:0; text-align:center;"';
-        itemLi += `<span style="display:inline;">(</span>`;
-        itemLi += `<input data-type="value" type="text" ${inputStyle} value="${item.data.uses.value}" ${app.options.editable ? "" : "disabled"}>`;
-        itemLi += `<span style="display:inline;">/</span>`;
-        itemLi += `<input data-type="max" type="text" ${inputStyle} value="${item.data.uses.max}" ${app.options.editable ? "" : "disabled"}>`;
-        itemLi += `<span style="display:inline;">)</span>`;
-    } else {
-        if (app.options.editable) {
-            itemLi += `<a class="addCharges" value="Add Charges">Add Charges</a>`
-        }
-    }
-    itemLi += `</div>`;
-    itemLi += `<div class="item-controlls" style="flex:0 0 44px;">`;
-    itemLi += `<a class="item-control item-edit" title="Edit Item" > <i class="fas fa-edit" ></i ></a >`;
-    itemLi += `<a class="item-control item-fav" title="remove from favourites" > <i class="fas fa-sign-out-alt" ></i ></a >`;
-    itemLi += `</div>`;
-    itemLi += `</li>`;
-    itemLi = $(itemLi);
-
-    // Activating favourite-list events
-
-    // showing item summary
-    itemLi.find('.item-name h4').click(event => app._onItemSummary(event));
-
-    // the rest is only needed if the sheet is editable
-    if (!app.options.editable) return itemLi;
-
-    // rolling the item
-    itemLi.find('.item-image').click(event => app._onItemRoll(event));
-
-    // editing the item
-    itemLi.find('.item-edit').click(event => {
-        //app.actor.getOwnedItem(item.id).sheet.render(true);
-        app.actor.getOwnedItem(item._id).sheet.render(true);
-        app.activateFavTab = true;
-    });
-
-    // removing item from favourite list
-    itemLi.find('.item-fav').click(ev => {
-        /*item.flags.favtab.isFavourite = !item.flags.favtab.isFavourite;
-        app.actor.updateOwnedItem(item, true);
-        app.activateFavTab = true;*/
-        app.actor.getOwnedItem(item._id).update({ "flags.favtab.isFavourite": !item.flags.favtab.isFavourite });
-    });
-
-    // changing the charges values (removing if both value and max are 0)
-    itemLi.find('.uses input').change(ev => {
-        let path = `data.uses.`+ev.target.dataset.type;
-        let obj = {};
-        obj[path] = Number(ev.target.value);
-        app.actor.getOwnedItem(item._id).update(obj);
-        app.activateFavTab = true;
-    })
-
-    // creating charges for the item
-    itemLi.find('.addCharges').click(ev => {
-        item.data.uses = { value: 1, max: 1 };
-        app.actor.updateOwnedItem(item, true);
-        app.activateFavTab = true;
-    });
-
-    // hiding the "add charges" button and only showing it when in the apropiate item
-    itemLi.find('.addCharges').hide();
-    itemLi.hover(evIn => {
-        itemLi.find('.addCharges').show();
-    }, evOut => {
-        itemLi.find('.addCharges').hide();
-    });
-    
-    return itemLi;
-}
-
-
-
-// function to return to the favourite tab after rerendering of the sheet
-// this is required since the sheet cant reopen an injected tab after rerendering
-function openFavouriteTab(app, html, data) {
-    app.activateFavTab = true;/*
-    setTimeout(() => {
-        console.log(app);
-        console.log($(`.app[data-appid="${app.appId}"] .tabs .item[data-tab="favourite"]`));
-        $(`.app[data-appid="${app.appId}"] .tabs .item[data-tab="favourite"]`).trigger('click');
-    }, 150);*/
-}

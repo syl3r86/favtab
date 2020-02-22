@@ -1,0 +1,42 @@
+.favourite ol {
+    padding-left:5px;
+    list-style-type:none;
+}
+
+.favourite .spell-slots {
+    display:inline; 
+    margin-left:10px;
+}
+
+.favourite .item .item-name {
+}
+
+.favourite .item .item-detail {
+    border:none;
+}
+
+.favourite .item .count {
+    flex:0 0 auto;
+}
+
+.favourite .item .labels {
+    flex:0 0 auto;
+    margin-right:5px;
+}
+
+.favourite .item .uses {
+    flex:0 0 80px;
+}
+
+.favourite .item .item-controlls {
+    flex:0 0 70px
+}
+
+.favourite .item input {
+    height:1em; 
+    width:1.5em; 
+    margin:0; 
+    padding:0; 
+    text-align:center;
+    border:none;
+}
