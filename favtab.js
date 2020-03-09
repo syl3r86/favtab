@@ -136,7 +136,8 @@ async function addFavTab(app, html, data) {
     // changing some css in the sheet to acomodate the new favourite button
     if (app.options.editable) {
         html.find('.spellbook .item-controls').css('flex', '0 0 88px');
-        html.find('.inventory .item-controls, .features .item-controls').css('flex', '0 0 66px');
+        html.find('.inventory .item-controls').css('flex', '0 0 88px');
+        html.find('.features .item-controls').css('flex', '0 0 66px');
         html.find('.favourite .item-controls').css('flex', '0 0 22px');
     }
 
