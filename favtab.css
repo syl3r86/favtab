@@ -8,7 +8,30 @@
     margin-left:10px;
 }
 
+.favourite .item .item-image {
+    flex: 0 0 30px;
+    background-size: 30px;
+    margin-right: 5px;
+}
+
+.favourite .item .item-image:hover {
+    background-image: url("/icons/svg/d20-black.svg") !important;
+}
+
 .favourite .item .item-name {
+    margin-right: 5px;
+}
+
+.favourite .item .item-shortcuts {
+    flex: 0 0 auto;
+}
+
+.favourite .item .item-shortcuts .tag {
+    font-size:20px;
+    width: 25px;
+    height: 25px;
+    align-self: center;
+    line-height: 25px;
 }
 
 .favourite .item .item-detail {
@@ -39,4 +62,12 @@
     padding:0; 
     text-align:center;
     border:none;
+}
+
+.favourite .item .item-toggle {
+    color: #b5b3a4;
+}
+
+.favourite .item .item-toggle.active {
+    color: #4b4a44;
 }

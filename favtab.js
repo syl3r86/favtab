@@ -69,6 +69,7 @@ async function addFavTab(app, html, data) {
 
     let renderFavTab = false;
 
+
     // processing all items and put them in their respective lists if they're favourited
     for (let item of items) {
         // do not add the fav button for class items
@@ -102,6 +103,24 @@ async function addFavTab(app, html, data) {
             if (item.data.activation.type) {
                 labels.activation = `${item.data.activation.cost ? item.data.activation.cost+' ':''}${item.data.activation.type.capitalize()}`;
             }
+
+            // adding info that damage and attacks are possible
+            if (['mwak', 'rwak', 'msak', 'rsak'].indexOf(item.data.actionType) !== -1) {
+                item.hasAttack = true;
+            }
+            if (item.data.damage.parts.length > 0) {
+                item.hasDamage = true;
+            }
+
+            let attr = item.type === "spell" ? "preparation.prepared" : "equipped";
+            let isActive = getProperty(item.data, attr);
+            item.toggleClass = isActive ? "active" : "";
+            if (item.type === "spell") {
+                item.toggleTitle = game.i18n.localize(isActive ? "DND5E.SpellPrepared" : "DND5E.SpellUnprepared");
+            } else {
+                item.toggleTitle = game.i18n.localize(isActive ? "DND5E.Equipped" : "DND5E.Unequipped");
+            }
+
             item.favLabels = labels;
             
             item.editable = app.options.editable;
@@ -113,8 +132,10 @@ async function addFavTab(app, html, data) {
                     favFeats.push(item);
                     break;
                 case 'spell':
-                    if (item.data.preparation.mode) {
-                        item.spellPrepMode = ` (${CONFIG.DND5E.spellPreparationModes[item.data.preparation.mode]})`
+                    if (item.data.preparation.mode && item.data.preparation.mode !== 'prepared') {
+                        item.spellPrepMode = ` (${CONFIG.DND5E.spellPreparationModes[item.data.preparation.mode]})`;
+                    } else {
+                        item.canPrep = true;
                     }
                     if (item.data.level) {
                         favSpells[item.data.level].spells.push(item);
@@ -127,6 +148,7 @@ async function addFavTab(app, html, data) {
                     if (item.flags.favtab.sort === undefined) {
                         item.flags.favtab.sort = (favItems.count + 1) * 100000; // initial sort key if not present
                     }
+                    item.isItem = true;
                     favItems.push(item);
                     break;
             }
@@ -165,6 +187,18 @@ async function addFavTab(app, html, data) {
             // rolling the item
             favtabHtml.find('.item-image').click(ev => app._onItemRoll(ev));
 
+            favtabHtml.find('.item-shortcuts .attack').click(ev => {
+                let itemId = event.currentTarget.closest(".item").dataset.itemId;
+                let item = app.actor.getOwnedItem(itemId);
+                item.rollAttack();
+            });
+
+            favtabHtml.find('.item-shortcuts .damage').click(ev => {
+                let itemId = event.currentTarget.closest(".item").dataset.itemId;
+                let item = app.actor.getOwnedItem(itemId);
+                item.rollDamage();
+            });
+
             // Item Dragging
             let handler = ev => app._onDragItemStart(ev);
             favtabHtml.find('.item').each((i, li) => {
@@ -177,6 +211,16 @@ async function addFavTab(app, html, data) {
             favtabHtml.find('.item-edit').click(ev => {
                 let itemId = $(ev.target).parents('.item')[0].dataset.itemId;
                 app.actor.getOwnedItem(itemId).sheet.render(true);
+            });
+
+            // toggle item icon
+            favtabHtml.find('.item-toggle').click(ev => {
+                event.preventDefault();
+                let itemId = event.currentTarget.closest(".item").dataset.itemId;
+                let item = app.actor.getOwnedItem(itemId);
+                let attr = item.data.type === "spell" ? "data.preparation.prepared" : "data.equipped";
+                return item.update({ [attr]: !getProperty(item.data, attr) });
+                //item.update(obj);
             });
 
             // removing item from favourite list
@@ -209,12 +253,16 @@ async function addFavTab(app, html, data) {
                 app.actor.getOwnedItem(itemId).update(data);
             });
 
-            // hiding the "add charges" button and only showing it when in the apropiate item
+            // hiding the "add charges" button, as well as roll buttons, and only showing it when in the apropiate item
             favtabHtml.find('.addCharges').hide();
+            favtabHtml.find('.item-shortcuts').hide();
+
             favtabHtml.find('.item').hover(evIn => {
                 $(evIn.target).parents('.item').find('.addCharges').show();
+                $(evIn.target).parents('.item').find('.item-shortcuts').show();
             }, evOut => {
                 $(evOut.target).parents('.item').find('.addCharges').hide();
+                $(evOut.target).parents('.item').find('.item-shortcuts').hide();
             });
 
             // custom sorting
