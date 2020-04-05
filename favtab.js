@@ -3,6 +3,7 @@
  * @version 0.5.4
  */
 
+
 async function addFavTab(app, html, data) {
 
     // checking compatibility
@@ -100,7 +101,7 @@ async function addFavTab(app, html, data) {
             if (item.data.components && item.data.components.concentration) {
                 labels.concentration = 'Concentration';
             }
-            if (item.data.activation.type) {
+            if (item.data.activation && item.data.activation.type) {
                 labels.activation = `${item.data.activation.cost ? item.data.activation.cost+' ':''}${item.data.activation.type.capitalize()}`;
             }
 
@@ -108,7 +109,7 @@ async function addFavTab(app, html, data) {
             if (['mwak', 'rwak', 'msak', 'rsak'].indexOf(item.data.actionType) !== -1) {
                 item.hasAttack = true;
             }
-            if (item.data.damage.parts.length > 0) {
+            if (item.data.damage && item.data.damage.parts.length > 0) {
                 item.hasDamage = true;
             }
 
@@ -191,6 +192,8 @@ async function addFavTab(app, html, data) {
                 let itemId = event.currentTarget.closest(".item").dataset.itemId;
                 let item = app.actor.getOwnedItem(itemId);
                 item.rollAttack();
+
+                BetterRollsDice.quickRollById("PPa8EzXh0sAwfiYH", "Fi4LSFygtrvA8bf2");
             });
 
             favtabHtml.find('.item-shortcuts .damage').click(ev => {
