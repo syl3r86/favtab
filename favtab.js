@@ -192,8 +192,6 @@ async function addFavTab(app, html, data) {
                 let itemId = event.currentTarget.closest(".item").dataset.itemId;
                 let item = app.actor.getOwnedItem(itemId);
                 item.rollAttack();
-
-                BetterRollsDice.quickRollById("PPa8EzXh0sAwfiYH", "Fi4LSFygtrvA8bf2");
             });
 
             favtabHtml.find('.item-shortcuts .damage').click(ev => {
@@ -307,6 +305,10 @@ async function addFavTab(app, html, data) {
 
                 app.actor.updateManyEmbeddedEntities("OwnedItem", updateData);
             });
+        }
+
+        if (window.BetterRolls) {
+            BetterRolls.addItemContent(app.object, favtabHtml, ".item .item-name h4", ".item-properties", ".item > .rollable");
         }
 
         // adding the html to the apropiate containers
