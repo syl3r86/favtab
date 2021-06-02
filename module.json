@@ -10,7 +10,7 @@
 	"packs": [],
     "url": "https://github.com/syl3r86/favtab",
     "manifest": "https://raw.githubusercontent.com/syl3r86/favtab/master/module.json",
-    "download": "https://github.com/syl3r86/favtab/archive/master.zip",
+    "download": "https://github.com/syl3r86/favtab/archive/v0.7.3.zip",
     "minimumCoreVersion": "0.5.5",
     "compatibleCoreVersion": "0.8.6"
 }
